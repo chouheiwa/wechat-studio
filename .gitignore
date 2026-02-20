@@ -1,0 +1,12 @@
+node_modules/
+.temp/
+
+# 图片上传临时文件
+*.tmp
+
+# macOS
+.DS_Store
+
+# 本地配置（如有）
+*.local.yaml
+package-lock.json
