@@ -6,6 +6,9 @@ on:
     tags:
       - 'v*'
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 jobs:
   build:
     name: ${{ matrix.target.name }}
@@ -54,3 +57,66 @@ jobs:
           name: ${{ matrix.target.artifact_name }}
           path: artifacts/${{ matrix.target.binary_name }}
           if-no-files-found: error
+
+  release:
+    name: Create Release
+    needs: build
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: release-assets
+
+      - name: Prepare release files
+        run: |
+          mkdir -p dist
+          cp release-assets/wechat-studio-proxy-linux-x64/wechat-studio-proxy dist/wechat-studio-proxy-linux-x64
+          cp release-assets/wechat-studio-proxy-macos-arm64/wechat-studio-proxy dist/wechat-studio-proxy-macos-arm64
+          cp release-assets/wechat-studio-proxy-windows-x64/wechat-studio-proxy.exe dist/wechat-studio-proxy-windows-x64.exe
+
+      - name: Generate changelog
+        id: changelog
+        run: |
+          TAG="${GITHUB_REF#refs/tags/}"
+          PREV_TAG=$(git tag --sort=-creatordate | grep '^v' | sed -n '2p')
+          if [ -n "$PREV_TAG" ]; then
+            LOG=$(git log "${PREV_TAG}..${TAG}" --pretty=format:"- %s (%h)" --no-merges)
+          else
+            LOG=$(git log "${TAG}" --pretty=format:"- %s (%h)" --no-merges)
+          fi
+          {
+            echo "body<<EOF"
+            echo "## What's Changed"
+            echo ""
+            echo "$LOG"
+            echo ""
+            echo "## Downloads"
+            echo ""
+            echo "| Platform | File |"
+            echo "|----------|------|"
+            echo "| Linux x64 | \`wechat-studio-proxy-linux-x64\` |"
+            echo "| macOS arm64 | \`wechat-studio-proxy-macos-arm64\` |"
+            echo "| Windows x64 | \`wechat-studio-proxy-windows-x64.exe\` |"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: ${{ github.ref_name }}
+          body: ${{ steps.changelog.outputs.body }}
+          files: |
+            dist/wechat-studio-proxy-linux-x64
+            dist/wechat-studio-proxy-macos-arm64
+            dist/wechat-studio-proxy-windows-x64.exe
