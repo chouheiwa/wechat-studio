@@ -88,7 +88,6 @@ npm run build:proxy-server:sea
 
 仓库内置了 GitHub Actions 工作流 [build-proxy-server-sea.yml](./.github/workflows/build-proxy-server-sea.yml)，可在 GitHub 上生成以下平台的 artifact：
 - Linux x64
-- macOS x64
 - macOS arm64
 - Windows x64
 

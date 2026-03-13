@@ -18,12 +18,8 @@ jobs:
             runner: ubuntu-24.04
             artifact_name: wechat-studio-proxy-linux-x64
             binary_name: wechat-studio-proxy
-          - name: macos-x64
-            runner: macos-13
-            artifact_name: wechat-studio-proxy-macos-x64
-            binary_name: wechat-studio-proxy
           - name: macos-arm64
-            runner: macos-14
+            runner: macos-15
             artifact_name: wechat-studio-proxy-macos-arm64
             binary_name: wechat-studio-proxy
           - name: windows-x64
