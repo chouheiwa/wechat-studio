@@ -18,9 +18,6 @@ await build({
   platform: 'node',
   target: 'node25',
   packages: 'bundle',
-  banner: {
-    js: '#!/usr/bin/env node',
-  },
   define: {
     'import.meta.dirname': JSON.stringify(path.join(projectRoot, 'scripts')),
   },
