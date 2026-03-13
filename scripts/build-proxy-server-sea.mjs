@@ -19,11 +19,9 @@ if (major < 25) {
   process.exit(1)
 }
 
-if (!fs.existsSync(bundlePath)) {
-  execFileSync(process.execPath, [path.join(projectRoot, 'scripts', 'build-proxy-server-bundle.mjs')], {
-    stdio: 'inherit',
-  })
-}
+execFileSync(process.execPath, [path.join(projectRoot, 'scripts', 'build-proxy-server-bundle.mjs')], {
+  stdio: 'inherit',
+})
 
 const seaConfigPath = path.join(os.tmpdir(), `wechat-studio-sea-${process.pid}.json`)
 const seaConfig = {

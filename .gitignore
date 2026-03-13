@@ -1,5 +1,6 @@
 node_modules/
 .temp/
+dist/
 
 # 图片上传临时文件
 *.tmp
