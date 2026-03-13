@@ -64,6 +64,34 @@ wechat:
 
 详见 [SKILL.md](./SKILL.md)。
 
+## 构建 Server Mode 可执行文件
+
+如果你只想部署远程代理服务，可以单独将 `proxy-server.mjs` 打包成单个可执行文件。
+
+本地构建要求：
+- Node.js 25.5.0+
+- 执行 `npm install`
+
+```bash
+npm run build:proxy-server:sea
+```
+
+构建输出：
+- `dist/wechat-studio-proxy`（Linux/macOS）
+- `dist/wechat-studio-proxy.exe`（Windows）
+
+运行方式：
+
+```bash
+./dist/wechat-studio-proxy --port 8080 --secret your-proxy-secret
+```
+
+仓库内置了 GitHub Actions 工作流 [build-proxy-server-sea.yml](./.github/workflows/build-proxy-server-sea.yml)，可在 GitHub 上生成以下平台的 artifact：
+- Linux x64
+- macOS x64
+- macOS arm64
+- Windows x64
+
 ## 可用主题
 
 | 主题 | 说明 |

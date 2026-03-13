@@ -1,0 +1,60 @@
+name: Build Proxy Server SEA
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build:
+    name: ${{ matrix.target.name }}
+    runs-on: ${{ matrix.target.runner }}
+    strategy:
+      fail-fast: false
+      matrix:
+        target:
+          - name: linux-x64
+            runner: ubuntu-24.04
+            artifact_name: wechat-studio-proxy-linux-x64
+            binary_name: wechat-studio-proxy
+          - name: macos-x64
+            runner: macos-13
+            artifact_name: wechat-studio-proxy-macos-x64
+            binary_name: wechat-studio-proxy
+          - name: macos-arm64
+            runner: macos-14
+            artifact_name: wechat-studio-proxy-macos-arm64
+            binary_name: wechat-studio-proxy
+          - name: windows-x64
+            runner: windows-2022
+            artifact_name: wechat-studio-proxy-windows-x64
+            binary_name: wechat-studio-proxy.exe
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 25.8.0
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build single executable
+        run: npm run build:proxy-server:sea
+
+      - name: Prepare artifact
+        shell: bash
+        run: |
+          mkdir -p artifacts
+          cp "dist/${{ matrix.target.binary_name }}" "artifacts/${{ matrix.target.binary_name }}"
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.target.artifact_name }}
+          path: artifacts/${{ matrix.target.binary_name }}
+          if-no-files-found: error
